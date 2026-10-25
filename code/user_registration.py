@@ -24,7 +24,7 @@ def validate_name(name: str) -> bool:
     """
     Checks if the name contains at least 3 characters.
     Args:
-        name (string): Original string value.
+        name (str): The users name.
     Returns:
         is_valid_name (bool): True if name contains at least 3 characters.
     """
@@ -36,11 +36,11 @@ def validate_name(name: str) -> bool:
 # ---------------------------------
 def validate_email(email: str) -> bool:
     """
-    Checks if the email contains "@" and ".".
+    Checks if the email contains both "@" and ".".
     Args:
-        email (string): Original string value.
+        email (string): The users email address.
     Returns:
-        is_valid_email (bool): True if email contains "@" and ".".
+        is_valid_email (bool): True if email contains both "@" and ".".
     """
     is_valid_email = "@" in email and "." in email
     return is_valid_email
@@ -55,22 +55,22 @@ def validate_password(password: str) -> bool:
         - Contains at least one uppercase letter
         - Contains at least one digit
     Args:
-        password (string): Original string value.
+        password (str): The users password.
     Returns:
         is_valid_password (bool): True if password meets all three conditions.
     """ 
     valid_length = len(password) >= 8
-    has_digit = not password.isalpha()
-    has_uppercase = (not password == password.lower())
+    has_digit = any(char.isdigit() for char in password)
+    has_uppercase = any(char.isupper() for char in password)
     is_valid_password = all([valid_length, has_digit, has_uppercase])
     return is_valid_password
 
 
 
 
-# # ---------------------------------
-# # MAIN Validation Function
-# # ---------------------------------
+# ---------------------------------
+# MAIN Validation Function
+# ---------------------------------
 def validate_user_data(name: str, email: str, password: str) -> bool:
     """
     This is an Orchestrator Function.
@@ -111,89 +111,191 @@ def validate_user_data(name: str, email: str, password: str) -> bool:
 
 
 
-# # ---------------------------------
-# # Registration Function
-# # ---------------------------------
-# def create_user_account(name: str, email: str, password: str) -> dict:
+# ---------------------------------
+# Registration Function
+# ---------------------------------
+def create_user_account(name: str, email: str, password: str) -> dict:
+    """
+    This function checks if a user is valid and can be added to the registered user list.
 
-#     # Validates the inputs
-#     if validate_user_data(name, email, password):
-#         user = {"name" : name, "email" : email, "password" : password}
-   
-#         # Checks whether the email already exists in registered_users list.
-#         if email in registered_users:
-#             print("ValueError: Email already exists in Registered Users")
-#             user["error message"] = "ValueError: Email already exists in Registered Users"
-#             failed_registrations.append(user)
-#             return None
-#         else:
-#             user["status"] = "active"
-#             registered_users.append(user)
-#             return user
+    If the users information is invalid, or their email already exists inside the registered users list, they will get put into the failed registration list along with a error message.
+
+    Args:
+        name (str): The users name.
+        email (str): The users email.
+        password (str): The users password.
+    Returns:
+        new_user (dict): If the user registration is valid.
+        None (None): If the user fails the registration.
+    """
+    # Checks if user data is valid
+    is_valid_user = validate_user_data(name, email, password)
+
+    # If the user data is not valid
+    if not is_valid_user:
+        print("ValueError: Users information is invalid")
+        value_error_user = "ValueError: Users information is invalid"
+        invalid_user = {
+            "name": name,
+            "email" : email,
+            "password" : password,
+            "error message" : value_error_user
+        }
+        failed_registrations.append(invalid_user)
+        
+    
+    elif is_valid_user:
+        # Checks if an email already exists
+        is_duplicate_email = any(email == user["email"] for user in registered_users)
+
+        if is_duplicate_email:
+            value_error = "ValueError: Email already exists in Registered Users"
+            invalid_user = {
+                "name": name,
+                "email" : email,
+                "password" : password,
+                "error message" : value_error
+            }
+            failed_registrations.append(invalid_user)
+
+        if not is_duplicate_email:
+            new_user = {
+                "name": name,
+                "email" : email,
+                "password" : password,
+                "status" : "active"
+            }
+            registered_users.append(new_user)
+            return new_user
+        
 
 
+# ---------------------------------
+# TESTING
+# ---------------------------------
+thick_line_break = "=" * 30
+thin_line_break = "-" * 30
 
-# NEW CODE BUT STILL NOT RIGHT
-# # ---------------------------------
-# def create_user_account(name: str, email: str, password: str) -> dict:
+# Valid Registration
+# ---------------------------------
+name = "Dylan"
+email = "dylan@gmail.com"
+password = "Password123"
+user = create_user_account(name, email, password)
 
-#     is_valid_user = validate_user_data(name, email, password)
-
-#     user = {
-#         "name" : name,
-#         "email" : email,
-#         "password" : password,
-#     }
-
-#     for user in registered_users:
-#         if email in user["email"]:
-#                 print("ValueError: Email already exists in Registered Users")
-#                 user["error message"] = "ValueError: Email already exists"
-#                 failed_registrations.append(user)
-
-#     if is_valid_user:
-#         print(f"is_valid_user :{is_valid_user}")
-#         user["status"] = "active"
-#         registered_users.append(user)
-
-#     else:
-#         print(f"is_valid_user :{is_valid_user}")
-#         user["error message"] = "ValueError: Invalid data"
-#         failed_registrations.append(user)
-
-
+print()
+print(thick_line_break)
+print("valid registration test".upper())
+print(thick_line_break)
+print("User:".upper(), user)
+print(thin_line_break)
+print("registered users".upper())
+print(thin_line_break)
+print(registered_users)
+print(thin_line_break)
+print("failed_registrations".upper())
+print(thin_line_break)
+print(failed_registrations)
+print(thin_line_break)
+print()
 
 
-
-
-
-
-# # ---------------------------------
-# # TESTING
-# # ---------------------------------
-
-# # Valid Registration
-# # ---------------------------------
+# Duplicate Email
+# ---------------------------------
 name = "Dylan"
 email = "dylan@gmail.com"
 password = "Password123"
 
-print()
-print(f"Created User:\n{create_user_account(name, email, password)}")
-print()
-print(f"Registered Users:\n{registered_users}")
-print()
-print(f"Failed Registrations:\n{failed_registrations}")
-
-# # Duplicate Registration
-# # ---------------------------------
-name = "Dy"
-email = "dylan@gmail.com"
-password = "Password123"
+user = create_user_account(name, email, password)
 
 print()
-print(f"Created User:\n{create_user_account(name, email, password)}")
+print(thick_line_break)
+print("duplicate email test".upper())
+print(thick_line_break)
+print("User:".upper(), user)
+print(thin_line_break)
+print("registered users".upper())
+print(thin_line_break)
+print(registered_users)
+print(thin_line_break)
+print("failed_registrations".upper())
+print(thin_line_break)
+print(failed_registrations)
+print(thin_line_break)
 print()
-print(f"Registered Users:\n{registered_users}")
+
+
+
+# Invalid Name
+# ---------------------------------
+name = "Jo"
+email = "jo@hotmail.com"
+password = "He11oHi3"
+
+user = create_user_account(name, email, password)
+
 print()
-print(f"Failed Registrations:\n{failed_registrations}")
+print(thick_line_break)
+print("invalid name test".upper())
+print(thick_line_break)
+print("User:".upper(), user)
+print(thin_line_break)
+print("registered users".upper())
+print(thin_line_break)
+print(registered_users)
+print(thin_line_break)
+print("failed_registrations".upper())
+print(thin_line_break)
+print(failed_registrations)
+print(thin_line_break)
+print()
+
+
+# Invalid Email
+# ---------------------------------
+name = "Sara"
+email = "saraoutlook.com"
+password = "SaraJl4dd9"
+
+user = create_user_account(name, email, password)
+
+print()
+print(thick_line_break)
+print("invalid email test".upper())
+print(thick_line_break)
+print("User:".upper(), user)
+print(thin_line_break)
+print("registered users".upper())
+print(thin_line_break)
+print(registered_users)
+print(thin_line_break)
+print("failed_registrations".upper())
+print(thin_line_break)
+print(failed_registrations)
+print(thin_line_break)
+print()
+
+
+# Invalid Password
+# ---------------------------------
+name = "Jeremy"
+email = "jeremy@bt-internet.com"
+password = "hello"
+
+user = create_user_account(name, email, password)
+
+print()
+print(thick_line_break)
+print("invalid password test".upper())
+print(thick_line_break)
+print("User:".upper(), user)
+print(thin_line_break)
+print("registered users".upper())
+print(thin_line_break)
+print(registered_users)
+print(thin_line_break)
+print("failed_registrations".upper())
+print(thin_line_break)
+print(failed_registrations)
+print(thin_line_break)
+print()
