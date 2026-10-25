@@ -1,5 +1,5 @@
 # ===============================================================
-# Secure User Registration System
+# User Registration System
 # ---------------------------------
 # A small user registration system.
 # 
