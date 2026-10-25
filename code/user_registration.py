@@ -114,7 +114,7 @@ def validate_user_data(name: str, email: str, password: str) -> bool:
 # ---------------------------------
 # Registration Function
 # ---------------------------------
-def create_user_account(name: str, email: str, password: str) -> dict:
+def create_user_account(name: str, email: str, password: str) -> dict | None:
     """
     This function checks if a user is valid and can be added to the registered user list.
 
